@@ -124,28 +124,26 @@
                     confidence intervals for wait-time predictions.</p>
             </header>
             <!-- Bento Grid - Key Metrics -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
                 <!-- Main Stat -->
-                <div
-                    class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm border-l-4 border-primary flex flex-col justify-between">
+                <div class="col-span-2 md:col-span-2 bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-sm border-l-4 border-primary flex flex-col justify-between">
                     <div>
-                        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Average Wait per
-                            Car</span>
-                        <div id="mainAverage" class="text-6xl font-extrabold font-headline mt-2 text-on-surface">
-                            184.2<span class="text-2xl font-medium text-secondary ml-2">sec</span></div>
+                        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Average Wait per Car</span>
+                        <div id="mainAverage" class="text-5xl md:text-6xl font-extrabold font-headline mt-2 text-on-surface">
+                            184.2<span class="text-xl md:text-2xl font-medium text-secondary ml-2">sec</span>
+                        </div>
                     </div>
-
                 </div>
-                <div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
-                    <span class="text-xs font-bold text-secondary uppercase tracking-widest">Observations</span>
-                    <div class="text-4xl font-extrabold font-headline mt-2">23</div>
-                    <p class="text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">
+                <div class="col-span-1 bg-surface-container-low p-5 md:p-8 rounded-xl flex flex-col justify-between">
+                    <span class="text-[10px] md:text-xs font-bold text-secondary uppercase tracking-widest">Observations</span>
+                    <div class="text-3xl md:text-4xl font-extrabold font-headline mt-2">23</div>
+                    <p class="text-[9px] md:text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">
                         High-fidelity per-car length timing samples</p>
                 </div>
-                <div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
-                    <span class="text-xs font-bold text-secondary uppercase tracking-widest">Resamples</span>
-                    <div class="text-4xl font-extrabold font-headline mt-2">5,000</div>
-                    <p class="text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">Iterative
+                <div class="col-span-1 bg-surface-container-low p-5 md:p-8 rounded-xl flex flex-col justify-between">
+                    <span class="text-[10px] md:text-xs font-bold text-secondary uppercase tracking-widest">Resamples</span>
+                    <div class="text-3xl md:text-4xl font-extrabold font-headline mt-2">5,000</div>
+                    <p class="text-[9px] md:text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">Iterative
                         bootstrap iterations performed</p>
                 </div>
             </div>
@@ -549,7 +547,8 @@
             let ciLower = waitSums.length > 0 ? waitSums[Math.floor(ITERATIONS * 0.025)] : 0;
             let ciUpper = waitSums.length > 0 ? waitSums[Math.floor(ITERATIONS * 0.975)] : 0;
 
-            let probCount = waitSums.filter(w => w <= targetTimeSec).length;            let probability = carsNum === 0 ? 100 : (probCount / ITERATIONS * 100);
+            let probCount = waitSums.filter(w => w <= targetTimeSec).length;
+            let probability = carsNum === 0 ? 100 : (probCount / ITERATIONS * 100);
 
             const formatTime = (secs) => {
                 if (secs === 0) return "0 hours, 0 minutes";
