@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Sonar Bangla Analytics | Fuel Station Metrics</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e6e8ea",
+                        "on-secondary-container": "#57657a",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed-variant": "#0040a1",
+                        "background": "#f7f9fb",
+                        "surface-variant": "#e0e3e5",
+                        "secondary": "#515f74",
+                        "on-surface-variant": "#424654",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dae2ff",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-primary-fixed": "#001847",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-container": "#914d00",
+                        "secondary-container": "#d5e3fc",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#2f1500",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "outline": "#737785",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#b2c5ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "on-background": "#191c1e",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c3c6d6",
+                        "surface-container": "#eceef0",
+                        "on-primary-container": "#ccd8ff",
+                        "on-tertiary-container": "#ffd0ad",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#6e3900",
+                        "primary-container": "#0056d2",
+                        "surface-tint": "#0056d2",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "primary": "#0040a1",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-error": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d8dadc",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background selection:bg-primary-fixed">
+    <!-- TopNavBar -->
+    <nav
+        class="bg-[#f7f9fb]/80 backdrop-blur-xl flex w-full top-0 z-50 sticky shadow-sm shadow-[#191c1e]/5 justify-between items-center px-8 h-16">
+        <div class="flex items-center gap-4">
+            <span class="text-xl font-bold tracking-tight text-[#191c1e]">Fuel Queue Analytics</span>
+        </div>
+    </nav>
+    <div class="flex">
+        <!-- Main Content -->
+        <main class="flex-1 p-8 min-h-screen max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <header class="mb-12">
+                <span class="text-xs font-bold tracking-[0.2em] text-on-surface-variant uppercase mb-2 block">System
+                    Status: Active</span>
+                <h1 class="text-5xl font-extrabold font-headline text-on-surface tracking-tight mb-4">Fuel Queue Wait
+                    Time & Probability Calculator</h1>
+                <p class="text-on-surface-variant max-w-2xl leading-relaxed">Statistical analysis of fueling durations
+                    at the Sonar Bangla Asadgate Station. This report utilizes the <span
+                        class="font-semibold text-primary">Bootstrap Resampling Method</span> to provide accurate
+                    confidence intervals for wait-time predictions.</p>
+            </header>
+            <!-- Bento Grid - Key Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                <!-- Main Stat -->
+                <div
+                    class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm border-l-4 border-primary flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-secondary uppercase tracking-widest">Average Wait per
+                            Car</span>
+                        <div id="mainAverage" class="text-6xl font-extrabold font-headline mt-2 text-on-surface">
+                            184.2<span class="text-2xl font-medium text-secondary ml-2">sec</span></div>
+                    </div>
+
+                </div>
+                <div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
+                    <span class="text-xs font-bold text-secondary uppercase tracking-widest">Observations</span>
+                    <div class="text-4xl font-extrabold font-headline mt-2">23</div>
+                    <p class="text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">
+                        High-fidelity per-car length timing samples</p>
+                </div>
+                <div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between">
+                    <span class="text-xs font-bold text-secondary uppercase tracking-widest">Resamples</span>
+                    <div class="text-4xl font-extrabold font-headline mt-2">5,000</div>
+                    <p class="text-[10px] text-on-surface-variant mt-2 leading-tight uppercase tracking-wider">Iterative
+                        bootstrap iterations performed</p>
+                </div>
+            </div>
+            <!-- Interactive Calculators Section -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Calculator 1: Wait Time Estimator -->
+                <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border-t-4 border-primary">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span
+                            class="material-symbols-outlined text-primary bg-primary-fixed p-2 rounded-lg">timer</span>
+                        <h3 class="font-headline font-bold text-xl">Wait Time Estimator</h3>
+                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">Number
+                                of cars ahead</label>
+                            <input id="carsInput"
+                                class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all"
+                                type="number" value="3" oninput="onWaitCarsChange()" />
+                        </div>
+                        <div class="bg-primary text-white p-6 rounded-xl relative overflow-hidden">
+                            <div class="relative z-10">
+                                <div class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Expected Wait
+                                    Time</div>
+                                <div id="expectedWait" class="text-4xl font-extrabold font-headline mt-1">...</div>
+                                <div class="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
+                                    <span class="text-xs">95% Range (CI)</span>
+                                    <span id="expectedWaitCI" class="text-sm font-bold">...</span>
+                                </div>
+                            </div>
+                            <div class="absolute top-0 right-0 p-4 opacity-10">
+                                <span class="material-symbols-outlined text-8xl">update</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Calculator 2: Probability Tool -->
+                <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border-t-4 border-tertiary">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span
+                            class="material-symbols-outlined text-tertiary bg-tertiary-fixed p-2 rounded-lg">calculate</span>
+                        <h3 class="font-headline font-bold text-xl">Probability Calculator</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">Cars
+                                    Ahead</label>
+                                <input id="carsProbInput"
+                                    class="w-full bg-surface-container-low border-none rounded-md px-4 py-2 focus:ring-2 focus:ring-tertiary focus:bg-surface-container-lowest transition-all"
+                                    type="number" value="3" oninput="onProbCarsChange()" />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">Target
+                                    Time (h)</label>
+                                <input id="targetTimeInput"
+                                    class="w-full bg-surface-container-low border-none rounded-md px-4 py-2 focus:ring-2 focus:ring-tertiary focus:bg-surface-container-lowest transition-all"
+                                    type="number" value="0.25" step="0.1" oninput="onProbTimeChange()" />
+                            </div>
+                        </div>
+                        <div class="bg-tertiary text-white p-6 rounded-xl flex items-center justify-between">
+                            <div>
+                                <div class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Finish
+                                    Probability</div>
+                                <div id="probOutput" class="text-4xl font-extrabold font-headline mt-1">...</div>
+                            </div>
+                            <div class="w-20 h-20 relative flex items-center justify-center">
+                                <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+                                    <path
+                                        d="M 50,10 L 74,10 Q 90,10 90,26 L 90,74 Q 90,90 74,90 L 26,90 Q 10,90 10,74 L 10,26 Q 10,10 26,10 Z"
+                                        fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="6" />
+                                    <path id="probProgressPath"
+                                        d="M 50,10 L 74,10 Q 90,10 90,26 L 90,74 Q 90,90 74,90 L 26,90 Q 10,90 10,74 L 10,26 Q 10,10 26,10 Z"
+                                        fill="transparent" stroke="white" stroke-width="6" stroke-linecap="round"
+                                        pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"
+                                        style="transition: stroke-dashoffset 0.5s ease-in-out;" />
+                                </svg>
+                                <span id="probWordLabel"
+                                    class="text-[10px] font-bold z-10 text-center leading-tight">High</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-secondary leading-relaxed italic">Statistical likelihood of
+                            completing fueling within the targeting threshold based on 5,000 empirical simulations.</p>
+                    </div>
+                </div>
+            </section>
+            <!-- Asymmetric Section: Analysis & Distribution -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Bootstrap Results Table -->
+                <div class="lg:col-span-1 bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+                    <div class="p-6 bg-surface-container-high flex justify-between items-center">
+                        <h3 class="font-headline font-bold text-sm uppercase tracking-wider">Bootstrap Parameters</h3>
+                        <span class="material-symbols-outlined text-primary">analytics</span>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <div class="text-[10px] text-secondary uppercase font-bold tracking-widest mb-1">Estimated
+                                Mean</div>
+                            <div id="bootMean" class="text-2xl font-bold font-headline">...</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-secondary uppercase font-bold tracking-widest mb-1">Standard
+                                Error</div>
+                            <div id="bootSE" class="text-2xl font-bold font-headline">...</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] text-secondary uppercase font-bold tracking-widest mb-1">95%
+                                Confidence Interval</div>
+                            <div id="bootCI" class="text-xl font-bold font-headline text-primary">...</div>
+                        </div>
+                        <div class="pt-4 border-t border-outline-variant/20">
+                            <p class="text-xs text-on-surface-variant leading-relaxed italic">"The bootstrap
+                                distribution provides robust, accurate 95% Confidence Intervals mapped to real-world
+                                operational distributions."</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Visualization: Density Plot -->
+                <div
+                    class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h3 class="font-headline font-bold text-xl tracking-tight">Distribution of Bootstrap Means
+                            </h3>
+                            <p class="text-xs text-secondary mt-1">N=5,000 iterations | Bootstrapped Frequencies</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex bg-surface-container-high rounded-lg p-1">
+                                <button id="btnHistogram" onclick="toggleChartType('bar')"
+                                    class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-transparent text-secondary hover:text-on-surface"
+                                    type="button">Histogram</button>
+                                <button id="btnSmooth" onclick="toggleChartType('line')"
+                                    class="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-surface-container-lowest text-primary shadow-sm"
+                                    type="button">Smooth</button>
+                            </div>
+                            <div class="flex gap-2">
+                                <span
+                                    class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-[10px] font-bold uppercase tracking-wider">Frequency</span>
+                                <span
+                                    class="px-3 py-1 bg-primary-container text-white rounded-full text-[10px] font-bold uppercase tracking-wider">Mean
+                                    Estimate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-64 relative w-full pt-10 pb-4 border-b border-outline-variant">
+                        <canvas id="bootstrapChart"></canvas>
+
+                        <div id="meanOverlayLine"
+                            class="absolute bottom-4 w-0.5 h-[calc(100%-3rem)] bg-primary border-r-2 border-dashed border-white shadow-xl z-10 pointer-events-none transform -translate-x-1/2">
+                        </div>
+                        <div id="meanOverlayText"
+                            class="absolute top-2 transform -translate-x-1/2 text-[10px] font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded-full z-10 whitespace-nowrap">
+                            μ = ...</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Methodology Section -->
+            <section class="bg-surface-container-low p-12 rounded-2xl mb-12 relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <span
+                        class="px-3 py-1 bg-surface-container-high rounded-full text-[10px] font-bold text-primary uppercase tracking-widest mb-4 inline-block">The
+                        Editorial Analyst Approach</span>
+                    <h2 class="text-3xl font-extrabold font-headline text-on-surface mb-6">Unlocking Precision with
+                        Bootstrapping</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <p class="text-on-surface-variant text-sm leading-relaxed mb-4">The Bootstrap method is a
+                                non-parametric approach to statistical inference. Because our sample size of 23
+                                observations is relatively small, traditional Gaussian assumptions may not hold true.
+                            </p>
+                            <p class="text-on-surface-variant text-sm leading-relaxed">By resampling our 23 data points
+                                5,000 times with replacement, we simulate the sampling distribution of the mean. This
+                                allows us to calculate an empirical standard error and confidence intervals without
+                                assuming a normal distribution.</p>
+                        </div>
+                        <div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col gap-4">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold">
+                                    1</div>
+                                <p class="text-xs text-on-surface">Resample with replacement from the original N=23
+                                    observations.</p>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold">
+                                    2</div>
+                                <p class="text-xs text-on-surface">Calculate the statistical parameters across all
+                                    resampled sets.</p>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold">
+                                    3</div>
+                                <p class="text-xs text-on-surface">Aggregate 5,000 simulation results to establish
+                                    precision confidence and percentiles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Background Decorative Element -->
+                <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-primary opacity-[0.03] rounded-full"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JS Implementation of Bootstrap Calculations and Visualization -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            runBootstrapStats();
+        });
+
+        // Original lengths recorded
+        const empiricalData = [279.0, 124.5, 168.0, 286.3333, 125.0, 490.0, 160.0, 85.2, 41.0, 262.6667, 382.0, 74.0, 79.5, 115.0, 177.0, 155.5, 237.0, 104.4, 86.0, 43.3333, 108.0, 238.0, 53.0];
+        const ITERATIONS = 5000;
+        let chartInstance = null;
+        let currentChartType = 'line';
+        let lastMeans = [];
+        let lastOverallMean = 0;
+
+        function toggleChartType(type) {
+            if (currentChartType === type) return;
+            currentChartType = type;
+
+            const btnHist = document.getElementById('btnHistogram');
+            const btnSmooth = document.getElementById('btnSmooth');
+
+            if (type === 'bar') {
+                btnHist.className = "px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-surface-container-lowest text-primary shadow-sm";
+                btnSmooth.className = "px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-transparent text-secondary hover:text-on-surface";
+            } else {
+                btnSmooth.className = "px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-surface-container-lowest text-primary shadow-sm";
+                btnHist.className = "px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all bg-transparent text-secondary hover:text-on-surface";
+            }
+
+            if (lastMeans.length > 0) {
+                renderChart(lastMeans, lastOverallMean);
+            }
+        }
+
+        // Generate global bootstrap of the mean directly
+        function runBootstrapStats() {
+            let means = [];
+
+            // Bootstrap mean values
+            for (let i = 0; i < ITERATIONS; i++) {
+                let sum = 0;
+                for (let j = 0; j < empiricalData.length; j++) {
+                    sum += empiricalData[Math.floor(Math.random() * empiricalData.length)];
+                }
+                means.push(sum / empiricalData.length);
+            }
+
+            means.sort((a, b) => a - b);
+            let overallMean = means.reduce((a, b) => a + b, 0) / ITERATIONS;
+
+            let sqDiffs = means.map(m => Math.pow(m - overallMean, 2));
+            let variance = sqDiffs.reduce((a, b) => a + b, 0) / (ITERATIONS - 1);
+            let standardError = Math.sqrt(variance);
+
+            let ciLower = means[Math.floor(ITERATIONS * 0.025)];
+            let ciUpper = means[Math.floor(ITERATIONS * 0.975)];
+
+            // Update Static DOM Results
+            document.getElementById('mainAverage').innerHTML = overallMean.toFixed(1) + '<span class="text-2xl font-medium text-secondary ml-2">sec</span>';
+            document.getElementById('bootMean').innerText = overallMean.toFixed(2) + 's';
+            document.getElementById('bootSE').innerText = standardError.toFixed(2) + 's';
+            document.getElementById('bootCI').innerText = ciLower.toFixed(1) + 's — ' + ciUpper.toFixed(1) + 's';
+
+            lastMeans = means;
+            lastOverallMean = overallMean;
+
+            // Draw chart for visual
+            renderChart(means, overallMean);
+
+            // Calculate initial dynamic stats
+            calculateDynamic();
+        }
+
+        function renderChart(means, overallMean) {
+            const ctx = document.getElementById('bootstrapChart').getContext('2d');
+
+            const bins = 40;
+            const min = Math.floor(means[0]);
+            const max = Math.ceil(means[means.length - 1]);
+            const binSize = (max - min) / bins;
+
+            let histogram = new Array(bins).fill(0);
+            for (let m of means) {
+                let binIndex = Math.floor((m - min) / binSize);
+                if (binIndex >= bins) binIndex = bins - 1;
+                histogram[binIndex]++;
+            }
+
+            let labels = [];
+            for (let i = 0; i < bins; i++) {
+                let val = min + (i + 0.5) * binSize;
+                labels.push(val.toFixed(0) + 's');
+            }
+
+            if (chartInstance) chartInstance.destroy();
+
+            const datasetConfig = currentChartType === 'line' ?
+                {
+                    data: histogram,
+                    backgroundColor: 'rgba(0, 86, 210, 0.2)',
+                    borderColor: 'rgba(0, 86, 210, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                } : {
+                    data: histogram,
+                    backgroundColor: 'rgba(0, 86, 210, 0.4)',
+                    borderColor: 'rgba(0, 86, 210, 1)',
+                    borderWidth: 1,
+                    barPercentage: 1.0,
+                    categoryPercentage: 1.0
+                };
+
+            chartInstance = new Chart(ctx, {
+                type: currentChartType,
+                data: {
+                    labels: labels,
+                    datasets: [datasetConfig]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#515f74',
+                                font: { size: 10, family: 'Manrope', weight: 'bold' },
+                                maxTicksLimit: 7
+                            }
+                        },
+                        y: { display: false }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                title: function (items) { return "Mean: " + items[0].label; },
+                                label: function (item) { return 'Frequency: ' + item.raw; }
+                            }
+                        }
+                    }
+                }
+            });
+
+            let leftPct = ((overallMean - min) / (max - min)) * 100;
+            leftPct = Math.max(5, Math.min(95, leftPct));
+            document.getElementById('meanOverlayLine').style.left = leftPct + '%';
+            let ovText = document.getElementById('meanOverlayText');
+            ovText.style.left = leftPct + '%';
+            ovText.innerText = "μ = " + overallMean.toFixed(2);
+        }
+
+        // Interactivity Handling
+        function onWaitCarsChange() {
+            let val = document.getElementById('carsInput').value;
+            document.getElementById('carsProbInput').value = val;
+            calculateDynamic();
+        }
+        function onProbCarsChange() {
+            let val = document.getElementById('carsProbInput').value;
+            document.getElementById('carsInput').value = val;
+            calculateDynamic();
+        }
+        function onProbTimeChange() {
+            calculateDynamic();
+        }
+
+        // Calculate the Wait Time and Probability bounds per interactive change
+        function calculateDynamic() {
+            let carsNum = parseInt(document.getElementById('carsInput').value);
+            if (isNaN(carsNum) || carsNum < 0) carsNum = 0;
+
+            let targetTimeHour = parseFloat(document.getElementById('targetTimeInput').value);
+            if (isNaN(targetTimeHour) || targetTimeHour < 0) targetTimeHour = 0;
+
+            // Convert target hours effectively to seconds for filtering
+            let targetTimeSec = targetTimeHour * 3600;
+
+            // Use pre-calculated bootstrap means to prevent resampling jitter per input
+            let waitSums = lastMeans.map(m => m * carsNum);
+
+            let meanWait = 0;
+            if (ITERATIONS > 0 && carsNum > 0) {
+                meanWait = waitSums.reduce((a, b) => a + b, 0) / ITERATIONS;
+            }
+
+            let ciLower = waitSums.length > 0 ? waitSums[Math.floor(ITERATIONS * 0.025)] : 0;
+            let ciUpper = waitSums.length > 0 ? waitSums[Math.floor(ITERATIONS * 0.975)] : 0;
+
+            let probCount = waitSums.filter(w => w <= targetTimeSec).length;            let probability = carsNum === 0 ? 100 : (probCount / ITERATIONS * 100);
+
+            const formatTime = (secs) => {
+                if (secs === 0) return "0 hours, 0 minutes";
+                let h = Math.floor(secs / 3600);
+                let m = Math.round((secs % 3600) / 60);
+                if (m === 60) { h += 1; m = 0; }
+
+                let hStr = h === 1 ? "1 hour" : `${h} hours`;
+                let mStr = m === 1 ? "1 minute" : `${m} minutes`;
+
+                if (h === 0) return mStr;
+                if (m === 0) return hStr;
+                return `${hStr}, ${mStr}`;
+            };
+
+            let probWord = "Impossible";
+            if (probability >= 100) probWord = "Absolutely";
+            else if (probability >= 80) probWord = "Very High";
+            else if (probability >= 60) probWord = "Moderately High";
+            else if (probability >= 40) probWord = "Moderate";
+            else if (probability >= 30) probWord = "Low";
+            else if (probability >= 11) probWord = "Moderately Low";
+            else if (probability > 0) probWord = "Very Low";
+
+            // Paint Data into UI
+            document.getElementById('expectedWait').innerText = formatTime(meanWait);
+            document.getElementById('expectedWaitCI').innerText = `${formatTime(ciLower)} — ${formatTime(ciUpper)}`;
+            document.getElementById('probOutput').innerHTML = probability.toFixed(1) + '<span class="text-lg opacity-70 ml-1">%</span>';
+
+            let pwLabel = document.getElementById('probWordLabel');
+            if (pwLabel) pwLabel.innerText = probWord;
+
+            let pPath = document.getElementById('probProgressPath');
+            if (pPath) pPath.style.strokeDashoffset = 100 - probability;
+        }
+    </script>
+</body>
+
+</html>
